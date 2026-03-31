@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import LandlordSidebar from "../../component/landlordComponent/landlordSidebar.jsx";
 import LandlordTopbar from "../../component/landlordComponent/landlordTopbar.jsx";
+import Layout from "../../component/Layout.jsx";
 
 const tenants = [
     {
@@ -32,7 +33,6 @@ const tenants = [
         priority: 3
     },
 ];
-
 
 function TenantCard({ t }) {
     const getParticipationColor = (pct) => {
@@ -83,7 +83,6 @@ function TenantCard({ t }) {
     );
 }
 
-
 export default function BehaviouralRiskPage({ onNavigate }) {
     const [activeTab, setActiveTab] = useState("All");
     const [searchTerm, setSearchTerm] = useState("");
@@ -104,9 +103,9 @@ export default function BehaviouralRiskPage({ onNavigate }) {
         // Filter by tab
         if (activeTab !== "All") {
             if (activeTab === "Stable") {
-                filtered = filtered.filter(t => t.riskTag === "STABLE");
+                filtered = filtered.filter(t => t.riskTag === "Stable");
             } else if (activeTab === "At Risk") {
-                filtered = filtered.filter(t => t.riskTag === "ELEVATED RISK");
+                filtered = filtered.filter(t => t.riskTag === "Elevated Risk");
             } else if (activeTab === "Early Warning Signals") {
                 filtered = filtered.filter(t => t.participation < 50);
             }
@@ -129,7 +128,7 @@ export default function BehaviouralRiskPage({ onNavigate }) {
         <div className="min-h-screen bg-gray-50">
             <LandlordSidebar activePage="behavioural-risk" onNavigate={onNavigate} />
             <LandlordTopbar />
-            <main className="ml-52 pt-14 p-6">
+            <Layout>
                 <div className="flex items-center justify-between mb-8">
                     <div>
                         <h1 className="text-2xl font-bold text-gray-900">Tenant Risk Monitor</h1>
@@ -204,7 +203,7 @@ export default function BehaviouralRiskPage({ onNavigate }) {
                         .map((t, i) => <TenantCard key={i} t={t} />)}
                 </div>
 
-            </main>
+            </Layout>
         </div>
     );
 }

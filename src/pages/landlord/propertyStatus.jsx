@@ -1,5 +1,6 @@
 import LandlordSidebar from "../../component/landlordComponent/landlordSidebar.jsx";
 import LandlordTopbar from "../../component/landlordComponent/landlordTopbar.jsx";
+import Layout from "../../component/Layout.jsx";
 
 const properties = [
     {
@@ -63,7 +64,7 @@ export default function PropertyStatusPage({ onNavigate }) {
         <div className="min-h-screen bg-gray-50">
             <LandlordSidebar activePage="property-status" onNavigate={onNavigate} />
             <LandlordTopbar />
-            <main className="ml-52 pt-14 p-6">
+            <Layout>
                 <h1 className="text-2xl font-bold text-gray-900 mb-1">Property Integrity Control Center</h1>
                 <p className="text-[14px] text-gray-500 mb-8">Track tenant Pre-Tenancy progress and ongoing behavioral monitoring for each property.</p>
 
@@ -132,7 +133,7 @@ export default function PropertyStatusPage({ onNavigate }) {
                         </div>
                     ))}
                 </div>
-            </main>
+            </Layout>
         </div>
     );
 }

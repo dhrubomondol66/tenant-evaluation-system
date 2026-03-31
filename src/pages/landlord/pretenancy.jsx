@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import LandlordSidebar from "../../component/landlordComponent/landlordSidebar.jsx";
 import LandlordTopbar from "../../component/landlordComponent/landlordTopbar.jsx";
+import Layout from "../../component/Layout.jsx";
 
 const applicants = [
     { name: "Applicant 1", property: "Maple Heights A-12", score: 62, trend: [40, 55, 62], riskTag: "STABLE", riskSub: "STABLE PARTICIPATION", tagColor: "bg-green-100 text-green-700", trendColor: "bg-green-400", low: "10%", high: "61%" },
@@ -38,7 +39,7 @@ export default function PreTenancyPage({ onNavigate }) {
         <div className="min-h-screen bg-gray-50">
             <LandlordSidebar activePage="pre-tenancy" onNavigate={onNavigate} />
             <LandlordTopbar />
-            <main className="ml-52 pt-14 p-6">
+            <Layout>
                 {/* Header */}
                 <div className="flex items-center justify-between mb-6">
                     <div>
@@ -146,13 +147,13 @@ export default function PreTenancyPage({ onNavigate }) {
                     <div className="px-5 py-3 border-t border-gray-100 flex items-center justify-between">
                         <span className="text-[12px] text-gray-400">Showing 5 of 124 results</span>
                         <div className="flex gap-1">
-                            {[1, 2].map((p) => (
+                            {[1, 2, 3, 4, 5].map((p) => (
                                 <button key={p} className={`w-7 h-7 rounded-lg text-[12px] font-medium ${p === 1 ? "bg-blue-600 text-white" : "text-gray-500 hover:bg-gray-100"}`}>{p}</button>
                             ))}
                         </div>
                     </div>
                 </div>
-            </main>
+            </Layout>
         </div>
     );
 }

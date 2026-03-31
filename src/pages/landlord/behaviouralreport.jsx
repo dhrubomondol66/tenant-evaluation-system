@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import LandlordSidebar from "../../component/landlordComponent/landlordSidebar.jsx";
 import LandlordTopbar from "../../component/landlordComponent/landlordTopbar.jsx";
+import Layout from "../../component/Layout.jsx";
 
 const earlySignals = [
     { day: "Day 1", title: "Participation Pattern", desc: "Initial engagement shows immediate responsiveness to the integrity cycle setup.", status: "Stabilized", color: "text-green-600" },
@@ -24,7 +25,7 @@ export default function BehavioralReportPage({ onNavigate }) {
         <div className="min-h-screen bg-gray-50">
             <LandlordSidebar activePage="pre-tenancy" onNavigate={onNavigate} />
             <LandlordTopbar />
-            <main className="ml-52 pt-14 p-6 flex flex-col items-center">
+            <Layout>
                 {/* Header */}
                 <div className="w-full max-w-3xl mb-8">
                     <div className="text-[12px] text-gray-400 mb-2">
@@ -116,7 +117,7 @@ export default function BehavioralReportPage({ onNavigate }) {
                         </div>
                     </div>
                 </div>
-            </main>
+            </Layout>
         </div>
     );
-}
+}

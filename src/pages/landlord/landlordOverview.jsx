@@ -1,326 +1,682 @@
-import { useState } from "react";
-import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip } from "recharts";
+// src/pages/Overview.jsx
+import { useState } from 'react';
 import LandlordSidebar from "../../component/landlordComponent/landlordSidebar.jsx";
 import LandlordTopbar from "../../component/landlordComponent/landlordTopbar.jsx";
+import Layout from "../../component/Layout.jsx";
 
-const trendData = [
-    { d: "Mon", v: 78 }, { d: "Tue", v: 80 }, { d: "Wed", v: 79 },
-    { d: "Thu", v: 83 }, { d: "Fri", v: 86 }, { d: "Sat", v: 88 }, { d: "Sun", v: 91 },
+// Progress components
+const days = [
+  {
+    day: 1,
+    status: "complete",
+    participation: "Completed",
+    timing: "On time",
+    timingDelay: false,
+    trend: null,
+    note: "Initial engagement started. Applicant responded to all prompts within expected timeframe.",
+    unlock: null,
+  },
+  {
+    day: 2,
+    status: "complete",
+    participation: "2/2 days",
+    timing: "Slight delay",
+    timingDelay: true,
+    trend: "Forming",
+    note: "Consistency beginning to form. Minor delay in afternoon check-in but all tasks completed.",
+    unlock: null,
+  },
+  {
+    day: 3,
+    status: "complete",
+    participation: "3/3 days",
+    timing: "On time",
+    timingDelay: false,
+    trend: null,
+    note: "Strong early pattern. Behavioral Report Preview is now unlocked.",
+    unlock: "Behavioral Report Preview",
+  },
+  { day: 4, status: "locked" },
+  { day: 5, status: "locked" },
+  { day: 6, status: "locked" },
+  { day: 7, status: "locked" },
+];
+
+const currentDay = 3;
+const totalDays = 7;
+
+function CheckIcon({ size = 16, color = "#4f46e5" }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 16 16" fill="none">
+      <path
+        d="M3 8L6.5 11.5L13 5"
+        stroke={color}
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function LockIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+      <rect x="3" y="7" width="10" height="8" rx="2" stroke="#9ca3af" strokeWidth="1.5" />
+      <path d="M5 7V5a3 3 0 016 0v2" stroke="#9ca3af" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function DayCard({ data, index }) {
+  const [hovered, setHovered] = useState(false);
+
+  if (data.status === "locked") {
+    return (
+      <div
+        style={{
+          borderRadius: "14px",
+          border: "1.5px solid #eef0f5",
+          padding: "18px 22px",
+          display: "flex",
+          alignItems: "center",
+          gap: "12px",
+          background: "#fafbfc",
+          opacity: 0.7,
+        }}
+      >
+        <div
+          style={{
+            width: 34,
+            height: 34,
+            borderRadius: "50%",
+            background: "#eef0f5",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexShrink: 0,
+          }}
+        >
+          <LockIcon />
+        </div>
+        <div>
+          <div style={{ fontWeight: 600, fontSize: "15px", color: "#9ca3af" }}>
+            Day {data.day}
+          </div>
+          <div style={{ fontSize: "12px", color: "#c9cdd8" }}>Locked</div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        borderRadius: "16px",
+        border: `1.5px solid ${hovered ? "#c4b5fd" : "#eef0f5"}`,
+        padding: "20px 22px",
+        background: hovered ? "#faf9ff" : "#fff",
+        transition: "all 0.2s ease",
+        boxShadow: hovered
+          ? "0 4px 24px rgba(124,58,237,0.08)"
+          : "0 1px 4px rgba(0,0,0,0.04)",
+      }}
+    >
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <div
+            style={{
+              width: 34,
+              height: 34,
+              borderRadius: "50%",
+              background: "#ede9fe",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+            }}
+          >
+            <CheckIcon size={15} color="#7c3aed" />
+          </div>
+          <span style={{ fontWeight: 700, fontSize: "16px", color: "#1a1d27" }}>
+            Day {data.day}
+          </span>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: "5px", fontSize: "13px", fontWeight: 600, color: "#16a34a" }}>
+          <CheckIcon size={12} color="#16a34a" />
+          {data.participation}
+        </div>
+      </div>
+      
+      <div style={{ fontSize: "12px", color: "#6b7280", marginBottom: "8px" }}>
+        <span style={{ fontWeight: 600, color: "#1a1d27" }}>Timing:</span> {data.timing}
+      </div>
+      
+      <div style={{ fontSize: "12px", color: "#6b7280", lineHeight: 1.5 }}>
+        {data.note}
+      </div>
+      
+      {data.unlock && (
+        <div style={{
+          marginTop: "12px",
+          padding: "8px 12px",
+          background: "#f0f9ff",
+          border: "1px solid #bae6fd",
+          borderRadius: "8px",
+          fontSize: "11px",
+          fontWeight: 600,
+          color: "#0369a1",
+        }}>
+          {data.unlock}
+        </div>
+      )}
+    </div>
+  );
+}
+
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  CartesianGrid,
+} from "recharts";
+
+const preTenanycRows = [
+  { name: "Alex Thompson", property: "Riverside A-12", score: 92, change: 5, changeType: "up", status: "Stable", stage: "Stage 1 Complete" },
+  { name: "Sarah Jenkins", property: "Riverside Apt 402", score: 46, change: 8, changeType: "down", status: "Monitor", stage: "Stage 2 Complete" },
+  { name: "Marcus Vane", property: "Oak Ridge Tower", score: 38, change: 14, changeType: "down", status: "ElevatedRisk", stage: "Ongoing Monitoring" },
+  { name: "Elena Rossi", property: "Maple Heights B-04", score: 85, change: 10, changeType: "up", status: "Stable", stage: "Stage 1 Complete" },
 ];
 
 const earlyWarnings = [
-    { name: "James Miller", detail: "Park View 101 • Participation Decline", color: "bg-red-500", severity: "High", detected: "2 days ago", new: true, trend: "Dropped from 88% to 72% in last 7 days" },
-    { name: "Linda Wu", detail: "Grand Plaza 55 • Missed Response Cycles", color: "bg-orange-400", severity: "Moderate", detected: "1 day ago", new: false, trend: "Participation dropped from 94% to 81%" },
-    { name: "Robert Hall", detail: "Hillside Manor 4 • Behavioral Shift", color: "bg-orange-400", severity: "Moderate", detected: "3 days ago", new: false, trend: "Response time delayed by 4.2h" },
-    { name: "Kevin Smith", detail: "Maple Heights A-31 • Integrity Score Drop", color: "bg-yellow-400", severity: "Low", detected: "5 days ago", new: false, trend: "Stability decreased by 3%" },
+  { name: "James Miller", detail: "Park View 101 • Participation Decline", dot: "bg-red-500" },
+  { name: "Linda Wu", detail: "Grand Plaza 3B • Missed Required Cycles", dot: "bg-yellow-400" },
+  { name: "Robert Hall", detail: "Hillside Manor • Behavioral Shift", dot: "bg-yellow-400" },
+  { name: "Kevin Smith", detail: "Maple Heights A-01 • Integrity Score Drop", dot: "bg-red-500" },
 ];
 
-const pretencys = [
-    { name: "Alex Thompson", property: "Riverside Apt", score: "82%", status: "Stable", statusColor: "bg-green-100 text-green-700", stage: "Stage 1 Complete" },
-    { name: "Sarah Jenkins", property: "Lakeside Apt 40L", score: "66%", delta: "-5%", status: "Monitor", statusColor: "bg-yellow-100 text-yellow-700", stage: "Stage 2 Complete" },
-    { name: "Marcus Vane", property: "Las Brias Drive", score: "54%", delta: "-14%", status: "Elevated Risk", statusColor: "bg-orange-100 text-orange-700", stage: "Ongoing Monitoring" },
-    { name: "Elena Rossi", property: "Maple Heights B/10", score: "80%", delta: "+16%", status: "Stable", statusColor: "bg-green-100 text-green-700", stage: "Stage 1 Complete" },
-];
-
-const STATES = {
-    NO_PROPERTY: "NO_PROPERTY",
-    PROPERTY_NO_TENANT: "PROPERTY_NO_TENANT",
-    TENANT_NO_MONITORING: "TENANT_NO_MONITORING",
-    MONITORING_ACTIVE: "MONITORING_ACTIVE"
+// Dynamic data based on current dashboard state
+const getDynamicData = (currentState) => {
+  switch (currentState) {
+    case "no-property":
+      return {
+        preTenancyRows: [],
+        earlyWarnings: [],
+        showPreTenancyTable: false,
+        showEarlyWarnings: false,
+        emptyMessage: "No properties added yet"
+      };
+    case "no-tenant":
+      return {
+        preTenancyRows: [],
+        earlyWarnings: [],
+        showPreTenancyTable: false,
+        showEarlyWarnings: false,
+        emptyMessage: "No active pre-tenancy processes"
+      };
+    case "pre-tenancy-active":
+      return {
+        preTenancyRows: preTenanycRows,
+        earlyWarnings: [],
+        showPreTenancyTable: true,
+        showEarlyWarnings: false,
+        emptyMessage: null
+      };
+    case "monitoring-inactive":
+    case "monitoring-active":
+      return {
+        preTenancyRows: [],
+        earlyWarnings: earlyWarnings,
+        showPreTenancyTable: false,
+        showEarlyWarnings: true,
+        emptyMessage: null
+      };
+    case "report-ready":
+      return {
+        preTenancyRows: preTenanycRows,
+        earlyWarnings: earlyWarnings,
+        showPreTenancyTable: true,
+        showEarlyWarnings: true,
+        emptyMessage: null
+      };
+    default:
+      return {
+        preTenancyRows: [],
+        earlyWarnings: [],
+        showPreTenancyTable: false,
+        showEarlyWarnings: false,
+        emptyMessage: null
+      };
+  }
 };
 
-export default function PortfolioOverviewPage({ onNavigate }) {
-    const [dashboardState, setDashboardState] = useState(STATES.MONITORING_ACTIVE);
-    const [reportReady, setReportReady] = useState(true); // For Day 3 Preview Card
+const StatusBadge = ({ status }) => {
+  const map = {
+    Stable: "bg-emerald-50 text-emerald-600 border-emerald-200",
+    Monitor: "bg-amber-50 text-amber-600 border-amber-200",
+    ElevatedRisk: "bg-red-50 text-red-500 border-red-200",
+  };
+  const label = status === "ElevatedRisk" ? "Elevated Risk" : status;
+  return (
+    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${map[status]}`}>
+      {label}
+    </span>
+  );
+};
 
-    const renderTopActionCard = () => {
-        let content = {};
-        switch (dashboardState) {
-            case STATES.NO_PROPERTY:
-                content = {
-                    title: "Add a Property",
-                    text: "Add a property to start managing tenants with Tenant Integrity.",
-                    button: "Add Property",
-                    action: () => onNavigate("property-status")
-                };
-                break;
-            case STATES.PROPERTY_NO_TENANT:
-                content = {
-                    title: "Start a Pre-Tenancy Process",
-                    text: "Add an applicant to begin the Integrity Cycle.",
-                    button: "Start Pre-Tenancy Process",
-                    action: () => onNavigate("pre-tenancy")
-                };
-                break;
-            case STATES.TENANT_NO_MONITORING:
-                content = {
-                    title: "Activate Tenant Monitoring",
-                    text: "Start behavioral monitoring for your existing tenant.",
-                    button: "Activate Monitoring",
-                    action: () => onNavigate("property-status")
-                };
-                break;
-            case STATES.MONITORING_ACTIVE:
-            default:
-                content = {
-                    title: "Monitoring Active",
-                    text: "View participation signals and early warnings.",
-                    button: "View Monitoring",
-                    action: () => onNavigate("behavioural-risk")
-                };
-                break;
-        }
+const ScoreBar = ({ score, status }) => {
+  const color =
+    status === "Stable" ? "bg-emerald-500" :
+    status === "Monitor" ? "bg-amber-400" : "bg-red-500";
+  return (
+    <div className="w-20 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+      <div className={`h-full rounded-full ${color}`} style={{ width: `${score}%` }} />
+    </div>
+  );
+};
 
-        return (
-            <div className="bg-white border border-blue-100 rounded-2xl p-6 mb-6 shadow-sm flex items-center justify-between border-l-4 border-l-blue-600">
-                <div className="flex items-center gap-5">
-                    <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600">
-                        <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-                            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                    </div>
-                    <div>
-                        <h2 className="text-lg font-bold text-gray-900">{content.title}</h2>
-                        <p className="text-[14px] text-gray-500 mt-0.5">{content.text}</p>
-                    </div>
-                </div>
-                <button
-                    onClick={content.action}
-                    className="bg-blue-600 text-white text-[14px] font-semibold px-6 py-2.5 rounded-xl hover:bg-blue-700 transition-all shadow-sm"
-                >
-                    {content.button}
-                </button>
-            </div>
-        );
-    };
+export default function Overview({ onNavigate }) {
+  const [dashState, setDashState] = useState("no-property");
+  const [showProgressModal, setShowProgressModal] = useState(false);
+  const [hoveredRisk, setHoveredRisk] = useState(null);
+  const [chartView, setChartView] = useState("participation"); // New state for chart toggle
 
-    return (
-        <div className="min-h-screen bg-gray-50">
-            <LandlordSidebar activePage="overview" onNavigate={onNavigate} />
-            <LandlordTopbar />
-            <main className="ml-52 pt-14 p-6">
-                {/* Header */}
-                <div className="flex items-center justify-between mb-6">
-                    <div>
-                        <h1 className="text-xl font-bold text-gray-900">Portfolio Overview</h1>
-                        <p className="text-[13px] text-gray-500 mt-0.5">
-                            This dashboard highlights participation and behavioral trends to help identify tenants who may require attention or follow-up.
-                        </p>
-                    </div>
-                    <div className="flex gap-2">
-                        {/* Dev State Toggler */}
-                        <select 
-                            onChange={(e) => setDashboardState(e.target.value)}
-                            value={dashboardState}
-                            className="bg-gray-100 border-none text-[11px] font-medium px-2 py-1 rounded-lg text-gray-500 outline-none"
-                        >
-                            <option value={STATES.NO_PROPERTY}>State 1: No Property</option>
-                            <option value={STATES.PROPERTY_NO_TENANT}>State 2: No Tenant</option>
-                            <option value={STATES.TENANT_NO_MONITORING}>State 3: No Monitoring</option>
-                            <option value={STATES.MONITORING_ACTIVE}>State 4: Active</option>
-                        </select>
-                        <button
-                            onClick={() => onNavigate("property-status")}
-                            className="flex items-center gap-2 bg-blue-600 text-white text-[13px] font-medium px-4 py-2 rounded-lg hover:bg-blue-700 transition-all"
-                        >
-                            <svg width="15" height="15" fill="none" viewBox="0 0 24 24">
-                                <path d="M12 5v14M5 12h14" stroke="white" strokeWidth="2" strokeLinecap="round" />
-                            </svg>
-                            Add Property
-                        </button>
-                    </div>
-                </div>
+  const states = ["no-property", "no-tenant", "pre-tenancy-active", "monitoring-inactive", "monitoring-active", "report-ready"];
 
-                {/* Top Action Card (CRITICAL) */}
-                {renderTopActionCard()}
+  const handleNextState = () => {
+    const currentIndex = states.indexOf(dashState);
+    const nextIndex = (currentIndex + 1) % states.length;
+    setDashState(states[nextIndex]);
+  };
 
-                {/* Behavioral Report Ready Card (Day 3) */}
-                {reportReady && dashboardState === STATES.MONITORING_ACTIVE && (
-                    <div className="bg-[#EEF2FF] border border-blue-200 rounded-2xl p-6 mb-6 flex items-center justify-between">
-                        <div className="flex items-center gap-5">
-                            <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-sm text-blue-600">
-                                <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-                                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                </svg>
-                            </div>
-                            <div>
-                                <h2 className="text-lg font-bold text-blue-900">Behavioral Report Ready</h2>
-                                <p className="text-[14px] text-blue-700 mt-0.5">Initial behavioral insights are now available for this applicant.</p>
-                            </div>
-                        </div>
-                        <button
-                            onClick={() => onNavigate("behavioural-report")}
-                            className="bg-blue-600 text-white text-[14px] font-semibold px-6 py-2.5 rounded-xl hover:bg-blue-700 transition-all shadow-md"
-                        >
-                            View Report Preview
-                        </button>
-                    </div>
-                )}
+  const handleViewProgress = () => {
+    setShowProgressModal(true);
+  };
 
-                {/* Stat Cards */}
-                <div className="grid grid-cols-5 gap-3 mb-5">
-                    {[
-                        { label: "Total Properties", val: dashboardState === STATES.NO_PROPERTY ? "0" : "24", badge: dashboardState === STATES.NO_PROPERTY ? null : "+2 added", badgeColor: "bg-green-100 text-green-600", icon: "🏢" },
-                        { label: "Active Tenants", val: dashboardState === STATES.NO_PROPERTY || dashboardState === STATES.PROPERTY_NO_TENANT ? "0" : "186", badge: dashboardState === STATES.NO_PROPERTY || dashboardState === STATES.PROPERTY_NO_TENANT ? null : "+4.2%", badgeColor: "bg-green-100 text-green-600", icon: "👥" },
-                        { label: "Vacancy Rate", val: dashboardState === STATES.NO_PROPERTY ? "0%" : (dashboardState === STATES.PROPERTY_NO_TENANT ? "100%" : "8.4%"), badge: "-1.0%", badgeColor: "bg-red-100 text-red-500", icon: "📊" },
-                        { label: "Avg. Tenant Stability", val: dashboardState === STATES.MONITORING_ACTIVE ? "92/100" : "N/A", badge: "-0.4%", badgeColor: "bg-red-100 text-red-500", icon: "📈" },
-                        { label: "Monitoring Status", val: dashboardState === STATES.MONITORING_ACTIVE ? "Active" : "Inactive", icon: "✅" },
-                    ].map((c) => (
-                        <div key={c.label} className="bg-white border border-gray-100 rounded-xl p-4">
-                            <div className="flex items-center justify-between mb-2">
-                                <span className="text-lg">{c.icon}</span>
-                                {c.badge && (
-                                    <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${c.badgeColor}`}>{c.badge}</span>
-                                )}
-                            </div>
-                            <div className="text-[10px] text-gray-400 font-medium uppercase tracking-wide mb-1">{c.label}</div>
-                            <div className="text-lg font-bold text-gray-900">{c.val}</div>
-                        </div>
-                    ))}
-                </div>
+  // Dynamic chart data based on selected view
+  const chartDataMap = {
+    participation: [
+      { day: "Mon", value: 82 },
+      { day: "Tue", value: 80 },
+      { day: "Wed", value: 85 },
+      { day: "Thu", value: 83 },
+      { day: "Fri", value: 88 },
+      { day: "Sat", value: 90 },
+      { day: "Sun", value: 89 },
+    ],
+    compliance: [
+      { day: "Mon", value: 95 },
+      { day: "Tue", value: 92 },
+      { day: "Wed", value: 88 },
+      { day: "Thu", value: 91 },
+      { day: "Fri", value: 94 },
+      { day: "Sat", value: 96 },
+      { day: "Sun", value: 93 },
+    ]
+  };
 
-                {dashboardState === STATES.MONITORING_ACTIVE ? (
-                    <>
-                        {/* Trend Chart */}
-                        <div className="bg-white border border-gray-100 rounded-xl p-5 mb-5">
-                            <div className="flex items-center justify-between mb-4">
-                                <div>
-                                    <div className="text-[14px] font-semibold text-gray-800">Tenant Engagement Trends</div>
-                                    <div className="text-[12px] text-gray-400">Weekly behavioural response</div>
-                                </div>
-                                <div className="flex gap-2">
-                                    <button className="text-[12px] text-gray-400 px-3 py-1 rounded-lg border border-gray-200 hover:bg-gray-50">Compliance</button>
-                                    <button className="text-[12px] text-blue-600 px-3 py-1 rounded-lg bg-blue-50 font-medium">Participation</button>
-                                </div>
-                            </div>
-                            <ResponsiveContainer width="100%" height={160}>
-                                <LineChart data={trendData}>
-                                    <XAxis dataKey="d" tick={{ fontSize: 11, fill: "#9ca3af" }} tickLine={false} axisLine={false} />
-                                    <YAxis domain={[60, 100]} tick={{ fontSize: 10, fill: "#9ca3af" }} tickLine={false} axisLine={false} />
-                                    <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #e5e7eb" }} />
-                                    <Line type="monotone" dataKey="v" stroke="#3b82f6" strokeWidth={2.5} dot={false} />
-                                </LineChart>
-                            </ResponsiveContainer>
-                        </div>
+  const chartData = chartDataMap[chartView];
 
-                        {/* Behavioral Risk Level */}
-                        <div className="bg-white border border-gray-100 rounded-xl p-5 mb-5">
-                            <div className="flex items-center gap-2 mb-4">
-                                <div className="text-[14px] font-semibold text-gray-800">Behavioral Risk Level</div>
-                                <svg width="14" height="14" fill="none" viewBox="0 0 24 24">
-                                    <circle cx="12" cy="12" r="9" stroke="#9ca3af" strokeWidth="1.8" />
-                                    <path d="M12 8v4" stroke="#9ca3af" strokeWidth="1.8" strokeLinecap="round" />
-                                    <circle cx="12" cy="16" r="1" fill="#9ca3af" />
-                                </svg>
-                            </div>
-                            <div className="grid grid-cols-4 gap-3">
-                                {[
-                                    { level: "High Risk", count: "6 Tenants", color: "border-red-200 bg-red-50", textColor: "text-red-600", dot: "bg-red-500", bar: "bg-red-400", barW: "30%", num: "6", desc: "Your portfolio currently has tenants who are not stable. Frequent action is required to ensure maximum performance." },
-                                    { level: "Elevated Risk", count: "12 Tenants", color: "border-orange-200 bg-orange-50", textColor: "text-orange-600", dot: "bg-orange-400", bar: "bg-orange-400", barW: "50%", num: "4", desc: "Participation has decreased over the last 7 days." },
-                                    { level: "Monitor", count: "24 Tenants", color: "border-yellow-200 bg-yellow-50", textColor: "text-yellow-600", dot: "bg-yellow-400", bar: "bg-yellow-400", barW: "70%", num: "12", desc: "Slight deviation on payment regularity." },
-                                    { level: "Stable", count: "154 Tenants", color: "border-green-200 bg-green-50", textColor: "text-green-600", dot: "bg-green-500", bar: "bg-green-400", barW: "90%", num: "24", desc: "Consistent behavior and engagement." },
-                                ].map((r) => (
-                                    <div key={r.level} className={`rounded-xl border p-4 ${r.color}`}>
-                                        <div className="flex items-center gap-2 mb-2">
-                                            <span className={`w-2 h-2 rounded-full ${r.dot}`} />
-                                            <span className={`text-[12px] font-bold ${r.textColor}`}>{r.level}</span>
-                                            <span className={`text-[11px] font-semibold ${r.textColor}`}>{r.count}</span>
-                                        </div>
-                                        <p className="text-[11px] text-gray-500 mb-3 leading-relaxed">{r.desc}</p>
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex-1 h-1.5 bg-gray-200 rounded-full mr-3">
-                                                <div className={`h-1.5 rounded-full ${r.bar}`} style={{ width: r.barW }} />
-                                            </div>
-                                            <span className={`text-xl font-bold ${r.textColor}`}>{r.num}</span>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                            <div className="mt-3 text-[12px] text-gray-500">
-                                ℹ️ Your portfolio stability is currently <span className="font-semibold text-green-600">Healthy</span>. Actions recommended for High Risk profiles.
-                            </div>
-                        </div>
+  const bannerConfig = {
+    "no-property": {
+      bg: "bg-gradient-to-r from-violet-600 to-violet-500",
+      icon: "🏢",
+      title: "Add Your First Property",
+      desc: "Get started by adding a property to your portfolio. Manage tenants, track rent, and monitor risk all in one place.",
+      btnLabel: "Add Property →",
+      btnClass: "bg-white text-violet-700 hover:bg-violet-50",
+    },
+    "no-tenant": {
+      bg: "bg-gradient-to-r from-blue-600 to-blue-500",
+      icon: "👤",
+      title: "Start a Pre-Tenancy Process",
+      desc: "You have properties but no active tenants. Begin screening applicants with our behavioral assessment cycle.",
+      btnLabel: "Start Pre-Tenancy Process→",
+      btnClass: "bg-white text-blue-700 hover:bg-blue-50",
+    },
+    "pre-tenancy-active": {
+      bg: "bg-gradient-to-r from-blue-600 to-blue-500",
+      icon: "📋",
+      title: "Pre-Tenancy In Progress",
+      desc: "Screening assessments are running for your applicants. Review progress in the Pre-Tenancy section.",
+      btnLabel: "View Progress →",
+      btnClass: "bg-white text-blue-700 hover:bg-blue-50",
+    },
+    "monitoring-inactive": {
+      bg: "bg-gradient-to-r from-gray-600 to-gray-500",
+      icon: "📊",
+      title: "Monitoring Not Yet Active",
+      desc: "Your tenants are onboarded. Activate behavioral monitoring to start tracking engagement and risk.",
+      btnLabel: "Activate Monitoring →",
+      btnClass: "bg-white text-gray-700 hover:bg-gray-50",
+    },
+    "monitoring-active": {
+      bg: "bg-gradient-to-r from-emerald-600 to-emerald-500",
+      icon: "✅",
+      title: "Monitoring Active",
+      desc: "All systems running. Behavioral data is being collected and analyzed for your portfolio.",
+      btnLabel: "View Dashboard →",
+      btnClass: "bg-white text-emerald-700 hover:bg-emerald-50",
+    },
+    "report-ready": {
+      bg: "bg-gradient-to-r from-orange-500 to-orange-400",
+      icon: "📄",
+      title: "Your Report Is Ready",
+      desc: "Monthly behavioral risk report is available. Review insights and take action on flagged tenants.",
+      btnLabel: "View Report →",
+      btnClass: "bg-white text-orange-600 hover:bg-orange-50",
+    },
+  };
 
-                        {/* Bottom Row */}
-                        <div className="grid grid-cols-2 gap-4">
-                            {/* Early Warning Center */}
-                            <div className="bg-white border border-gray-100 rounded-xl p-5">
-                                <div className="flex items-center justify-between mb-4">
-                                    <div className="flex items-center gap-2">
-                                        <span className="w-2 h-2 rounded-full bg-red-500" />
-                                        <span className="text-[14px] font-semibold text-gray-800">Early Warning Center</span>
-                                    </div>
-                                    <button onClick={() => onNavigate("early-warnings")} className="text-[12px] text-blue-500 hover:underline font-medium">
-                                        View All Alerts →
-                                    </button>
-                                </div>
-                                <div className="flex flex-col gap-3">
-                                    {earlyWarnings.map((w) => (
-                                        <div key={w.name} className="flex items-center gap-3">
-                                            <span className={`w-2 h-2 rounded-full shrink-0 ${w.color}`} />
-                                            <div>
-                                                <div className="text-[13px] font-semibold text-gray-800">{w.name}</div>
-                                                <div className="text-[11px] text-gray-400">{w.detail}</div>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
+  const banner = bannerConfig[dashState];
+  const dynamicData = getDynamicData(dashState);
 
-                            {/* Pre-Tenancy Process */}
-                            <div className="bg-white border border-gray-100 rounded-xl p-5">
-                                <div className="flex items-center justify-between mb-4">
-                                    <span className="text-[14px] font-semibold text-gray-800">Pre-Tenancy Process</span>
-                                    <button
-                                        onClick={() => onNavigate("pre-tenancy")}
-                                        className="flex items-center gap-1.5 bg-blue-600 text-white text-[12px] font-medium px-3 py-1.5 rounded-lg hover:bg-blue-700 transition-all"
-                                    >
-                                        <svg width="13" height="13" fill="none" viewBox="0 0 24 24">
-                                            <path d="M12 5v14M5 12h14" stroke="white" strokeWidth="2" strokeLinecap="round" />
-                                        </svg>
-                                        Start Pre-Tenancy Process
-                                    </button>
-                                </div>
-                                <div className="text-[10px] text-gray-400 grid grid-cols-3 gap-2 mb-2 font-medium uppercase">
-                                    <span>APPLICANT</span><span>STATUS</span><span>DATE</span>
-                                </div>
-                                <div className="flex flex-col gap-2">
-                                    {pretencys.map((s) => (
-                                        <div key={s.name} className="grid grid-cols-3 gap-2 items-center">
-                                            <div>
-                                                <div className="text-[12px] font-semibold text-gray-800">{s.name}</div>
-                                                <div className="text-[11px] text-gray-400">{s.property}</div>
-                                            </div>
-                                            <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full w-fit ${s.statusColor}`}>{s.status}</span>
-                                            <span className="text-[11px] text-gray-500">{s.stage}</span>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                    </>
-                ) : (
-                    <div className="bg-white border border-gray-100 rounded-2xl p-20 flex flex-col items-center justify-center text-center">
-                        <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center text-gray-300 mb-6 font-bold text-3xl">
-                            {dashboardState === STATES.NO_PROPERTY ? "🏠" : "🔍"}
-                        </div>
-                        <h3 className="text-xl font-bold text-gray-900 mb-2">
-                            {dashboardState === STATES.NO_PROPERTY ? "No Properties Added Yet" : "No Active Monitoring"}
-                        </h3>
-                        <p className="text-gray-500 max-w-sm mb-8">
-                            {dashboardState === STATES.NO_PROPERTY 
-                                ? "Start by adding your first property to begin monitoring tenant behavior and integrity."
-                                : "Add a tenant to a property and activate monitoring to start receiving behavioral insights."}
-                        </p>
-                        <button
-                            onClick={() => onNavigate(dashboardState === STATES.NO_PROPERTY ? "property-status" : "pre-tenancy")}
-                            className="bg-blue-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-blue-700 transition-all shadow-md"
-                        >
-                            {dashboardState === STATES.NO_PROPERTY ? "Add Your First Property" : "Start Pre-Tenancy Process"}
-                        </button>
-                    </div>
-                )}
-            </main>
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <LandlordSidebar activePage="overview" onNavigate={onNavigate} />
+      <LandlordTopbar />
+      <Layout>
+      {/* ── Banner ── */}
+      <div className={`${banner.bg} rounded-xl p-5 mb-6 flex items-center justify-between shadow-md`}>
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center text-2xl shrink-0">
+            {banner.icon}
+          </div>
+          <div>
+            <h2 className="text-[16px] font-bold text-white">{banner.title}</h2>
+            <p className="text-[12px] text-white/80 mt-0.5 max-w-md">{banner.desc}</p>
+          </div>
         </div>
-    );
-}
+        <button 
+          onClick={dashState === "pre-tenancy-active" ? handleViewProgress : handleNextState}
+          className={`px-4 py-2 rounded-lg text-[12.5px] font-bold transition-all shrink-0 ${banner.btnClass}`}
+        >
+          {banner.btnLabel}
+        </button>
+      </div>
+
+      {/* ── Stat Cards ── */}
+      <div className="grid grid-cols-5 gap-3 mb-6">
+        {[
+          { icon: "🏢", iconBg: "bg-emerald-100", label: "Total Properties", value: "0", change: "+2 added", changeClass: "text-emerald-600" },
+          { icon: "👤", iconBg: "bg-blue-100", label: "Active Tenants", value: "10", change: "-4.2%", changeClass: "text-red-500" },
+          { icon: "🔔", iconBg: "bg-violet-100", label: "Vacancy Rate", value: "8.4%", change: "-1.2%", changeClass: "text-emerald-600" },
+          { icon: "📈", iconBg: "bg-orange-100", label: "Avg. Tenant Stability", value: "92/100", change: "+2.4%", changeClass: "text-emerald-600" },
+          { icon: "🛡️", iconBg: "bg-emerald-100", label: "Monitoring Status", value: "Active", change: "", changeClass: "" },
+        ].map((card) => (
+          <div key={card.label} className="bg-white border border-gray-100 rounded-xl p-4 shadow-sm">
+            <div className="flex items-start justify-between mb-3">
+              <div className={`w-8 h-8 ${card.iconBg} rounded-lg flex items-center justify-center text-[15px]`}>
+                {card.icon}
+              </div>
+              {card.change && (
+                <span className={`text-[10px] font-semibold ${card.changeClass}`}>{card.change}</span>
+              )}
+            </div>
+            <p className="text-[18px] font-extrabold text-gray-900 leading-tight">{card.value}</p>
+            <p className="text-[11px] text-gray-400 mt-0.5">{card.label}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* ── Chart ── */}
+      <div className="bg-white border border-gray-100 rounded-xl p-5 shadow-sm mb-5">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h3 className="text-[14px] font-bold text-gray-900">Tenant Engagement Trends</h3>
+            <p className="text-[11.5px] text-gray-400">Weekly behavioural response</p>
+          </div>
+          <div className="flex gap-3 text-[11.5px] font-semibold">
+            <span 
+              className={`cursor-pointer transition-colors ${
+                chartView === "compliance" 
+                  ? "text-blue-600 border-b-2 border-blue-600 pb-0.5" 
+                  : "text-gray-400 hover:text-gray-600"
+              }`}
+              onClick={() => setChartView("compliance")}
+            >
+              Compliance
+            </span>
+            <span 
+              className={`cursor-pointer transition-colors ${
+                chartView === "participation" 
+                  ? "text-blue-600 border-b-2 border-blue-600 pb-0.5" 
+                  : "text-gray-400 hover:text-gray-600"
+              }`}
+              onClick={() => setChartView("participation")}
+            >
+              Participation
+            </span>
+          </div>
+        </div>
+        <ResponsiveContainer width="100%" height={180}>
+          <LineChart data={chartData}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+            <XAxis dataKey="day" tick={{ fontSize: 11, fill: "#9ca3af" }} axisLine={false} tickLine={false} />
+            <YAxis domain={[60, 100]} tick={{ fontSize: 11, fill: "#9ca3af" }} axisLine={false} tickLine={false} width={28} />
+            <Tooltip
+              contentStyle={{ border: "1px solid #e5e7eb", borderRadius: 8, fontSize: 12 }}
+              cursor={{ stroke: "#e5e7eb" }}
+            />
+            <Line type="monotone" dataKey="value" stroke="#3b82f6" strokeWidth={2.5} dot={false} />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+
+      {/* ── Behavioral Risk Level ── */}
+      <div className="bg-white border border-gray-100 rounded-xl p-5 shadow-sm mb-5">
+        <div className="flex items-center gap-2 mb-4">
+          <h3 className="text-[14px] font-bold text-gray-900">Behavioral Risk Level</h3>
+          <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          {/* <div className="ml-2 bg-orange-50 border border-orange-200 rounded px-2 py-1 text-[9.5px] text-orange-600 font-medium max-w-[200px] leading-tight">
+            Your portfolio is currently stable. Review high-risk tenants to maintain performance.
+          </div> */}
+        </div>
+
+        <div className="grid grid-cols-4 gap-3 mb-4">
+          {[
+            { label: "Elevated Risk", count: "8 Tenants", desc: "Your portfolio is currently stable. Review high-risk tenants to maintain performance.", score: 1, barColor: "bg-red-500", iconColor: "text-red-500", icon: "⚠️" },
+            { label: "Elevated Risk", count: "12 Tenants", desc: "Participation decreased over the last 7 days.", score: 4, barColor: "bg-orange-400", iconColor: "text-orange-500", icon: "⏱️" },
+            { label: "Monitor", count: "24 Tenants", desc: "Slight deviation in payment regularity.", score: 12, barColor: "bg-yellow-400", iconColor: "text-yellow-500", icon: "👁️" },
+            { label: "Stable", count: "154 Tenants", desc: "Consistent behavior and engagement.", score: 24, barColor: "bg-emerald-500", iconColor: "text-emerald-600", icon: "✅" },
+          ].map((item, i) => (
+            <div 
+              key={i} 
+              className="border border-gray-100 rounded-lg p-3 relative"
+              onMouseEnter={() => setHoveredRisk(i)}
+              onMouseLeave={() => setHoveredRisk(null)}
+            >
+              <div className="flex items-center gap-1.5 mb-1">
+                <span className="text-[13px]">{item.icon}</span>
+                <span className={`text-[11px] font-bold ${item.iconColor}`}>{item.label}</span>
+                <span className={`text-[10px] font-semibold ml-auto ${item.iconColor}`}>{item.count}</span>
+              </div>
+              <p className="text-[10px] text-gray-400 mb-2 leading-tight">{item.desc}</p>
+              <div className="flex items-center justify-between">
+                <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden mr-2">
+                  <div className={`h-full ${item.barColor} rounded-full`} style={{ width: `${Math.min(item.score * 4, 100)}%` }} />
+                </div>
+                <span className="text-[13px] font-extrabold text-gray-800">{item.score}</span>
+              </div>
+              
+              {/* Tooltip */}
+              {hoveredRisk === i && (
+                <div className={`absolute z-10 bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 text-white text-[10px] rounded-lg shadow-lg whitespace-nowrap ${
+                  item.label === "Elevated Risk" ? "bg-red-500" :
+                  item.label === "Monitor" ? "bg-yellow-400" :
+                  item.label === "Stable" ? "bg-emerald-500" :
+                  "bg-orange-400"
+                }`}>
+                  <div className="font-semibold mb-1">{item.label}</div>
+                  <div className="text-white/90">{item.desc}</div>
+                  <div className={`absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 rotate-45 w-2 h-2 ${
+                    item.label === "Elevated Risk" ? "bg-red-500" :
+                    item.label === "Monitor" ? "bg-yellow-400" :
+                    item.label === "Stable" ? "bg-emerald-500" :
+                    "bg-orange-400"
+                  }`}></div>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        <div className="bg-blue-50 border border-blue-100 rounded-lg px-4 py-2.5 flex items-center gap-2">
+          <svg className="w-3.5 h-3.5 text-blue-500 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <p className="text-[11.5px] text-blue-700">
+            Your portfolio stability is currently <span className="font-bold">Healthy</span>. Action is recommended for High Risk profiles.
+          </p>
+        </div>
+      </div>
+
+      {/* ── Bottom Row ── */}
+      <div className="grid grid-cols-2 gap-4">
+        {/* Early Warning Center */}
+        {dynamicData.showEarlyWarnings && (
+          <div className="bg-white border border-gray-100 rounded-xl p-5 shadow-sm">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                <h3 className="text-[13.5px] font-bold text-gray-900">Early Warning Center</h3>
+              </div>
+              <button className="text-[11px] font-semibold text-blue-600 hover:underline flex items-center gap-1">
+                View All Alerts
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+              </button>
+            </div>
+            <div className="flex flex-col gap-3">
+              {dynamicData.earlyWarnings.map((w, i) => (
+                <div key={i} className="flex items-start gap-2.5">
+                  <div className={`w-2 h-2 rounded-full ${w.dot} mt-1.5 shrink-0`} />
+                  <div>
+                    <p className="text-[12.5px] font-semibold text-gray-800">{w.name}</p>
+                    <p className="text-[11px] text-gray-400">{w.detail}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Pre Tenancy Process */}
+        {dynamicData.showPreTenancyTable && (
+        <div className="bg-white border border-gray-100 rounded-xl p-5 shadow-sm mb-5">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-[14px] font-bold text-gray-900">Pre-Tenancy Applications</h3>
+            <button className="flex items-center gap-2 text-[12px] font-medium text-blue-600 hover:text-blue-700 transition-colors">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+              </svg>
+              Start New Process
+            </button>
+          </div>
+
+          <div className="text-[10px] font-bold uppercase tracking-widest text-gray-400 grid grid-cols-4 gap-2 mb-2 px-1">
+            <span>Applicant</span>
+            <span>Property</span>
+            <span>Status</span>
+            <span>Date</span>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            {dynamicData.preTenancyRows.map((row, i) => (
+              <div key={i} className="grid grid-cols-4 gap-2 items-center py-2 border-t border-gray-50">
+                <div>
+                  <p className="text-[12px] font-semibold text-gray-800">{row.name}</p>
+                  <p className="text-[10px] text-gray-400">{row.property}</p>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[12px] font-bold text-gray-800">{row.score}%</span>
+                  <span className={`text-[10px] font-semibold ${row.changeType === "up" ? "text-emerald-600" : "text-red-500"}`}>
+                    {row.changeType === "up" ? "↑" : "↓"}{row.change}%
+                  </span>
+                  <ScoreBar score={row.score} status={row.status} />
+                </div>
+                <StatusBadge status={row.status} />
+                <p className="text-[10.5px] text-gray-500">{row.stage}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      </div>
+
+      {/* ── Demo State Switcher ── */}
+      <div className="mt-6 pt-4 border-t border-gray-100">
+        <p className="text-[10px] font-semibold uppercase tracking-widest text-gray-400 mb-2">Demo · Switch Dashboard State</p>
+        <div className="flex gap-2 flex-wrap">
+          {states.map((s) => (
+            <button
+              key={s}
+              onClick={() => setDashState(s)}
+              className={`px-3 py-1 rounded-md text-[11px] font-semibold transition-all ${
+                dashState === s
+                  ? "bg-gray-800 text-white"
+                  : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+              }`}
+            >
+              {s}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Progress Modal */}
+      {showProgressModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto m-4">
+            <div className="flex items-center justify-between p-6 border-b border-gray-100">
+              <h2 className="text-xl font-bold text-gray-900">Pre-Tenancy Progress</h2>
+              <button 
+                onClick={() => setShowProgressModal(false)}
+                className="w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-all"
+              >
+                <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="p-6">
+              {/* Progress Header */}
+              <div className="mb-6">
+                <h2 className="text-xl font-bold text-gray-900 mb-2">7-Day Behavioral Assessment Cycle</h2>
+                
+                {/* Progress bar */}
+                <div className="flex gap-1 mb-2">
+                  {Array.from({ length: totalDays }).map((_, i) => (
+                    <div
+                      key={i}
+                      className={`flex-1 h-1 rounded-full ${
+                        i < currentDay ? "bg-violet-600" : "bg-gray-100"
+                      }`}
+                    />
+                  ))}
+                </div>
+                <div className="text-sm text-gray-500">Day {currentDay} of {totalDays}</div>
+              </div>
+
+              {/* Day Cards */}
+              <div className="space-y-3 max-h-96 overflow-y-auto">
+                {days.map((d, i) => (
+                  <DayCard key={d.day} data={d} index={i} />
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      </Layout>
+    </div>
+  );
+}

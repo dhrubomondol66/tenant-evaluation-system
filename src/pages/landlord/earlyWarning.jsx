@@ -1,5 +1,6 @@
 import LandlordSidebar from "../../component/landlordComponent/landlordSidebar.jsx";
 import LandlordTopbar from "../../component/landlordComponent/landlordTopbar.jsx";
+import Layout from "../../component/Layout.jsx";
 
 const initialCriticalTenants = [
     {
@@ -99,22 +100,22 @@ export default function EarlyWarningsPage({ onNavigate }) {
 
     const sortedAlerts = [...alerts].sort((a, b) => a.priority - b.priority);
 
-
     const getTrendIcon = (trend, pct) => {
-        if (pct >= 85) return "🟢";
-        if (pct >= 70) return "🟡";
-        return "🔴";
+        if (pct >= 85) return "";
+        if (pct >= 70) return "";
+        return "";
     };
+
     return (
         <div className="min-h-screen bg-gray-50">
             <LandlordSidebar activePage="early-warnings" onNavigate={onNavigate} />
             <LandlordTopbar />
-            <main className="ml-52 pt-14 p-10 w-full max-w-none mt-3">
+            <Layout>
                 <div className="flex items-center justify-between mb-1">
-                    <h1 className="text-xl font-bold text-gray-900">Early Warning Center</h1>
-                    <span className="text-[14px] font-semibold text-blue-600 bg-blue-50 px-3 py-1 rounded-full border border-blue-100">
-                        {alerts.length} alerts detected
-                    </span>
+                        <h1 className="text-xl font-bold text-gray-900">Early Warning Center</h1>
+                        <span className="text-[14px] font-semibold text-blue-600 bg-blue-50 px-3 py-1 rounded-full border border-blue-100">
+                            {alerts.length} alerts detected
+                        </span>
                 </div>
                 <p className="text-[13px] text-gray-500 mb-2">
                     Detect behavioral changes before they become costly tenant issues.
@@ -274,7 +275,7 @@ export default function EarlyWarningsPage({ onNavigate }) {
                         </div>
                     ))}
                 </div>
-            </main>
+            </Layout>
         </div>
     );
 }
