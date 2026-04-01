@@ -12,6 +12,7 @@ import OverviewPage from './pages/admin/adminOverview.jsx'
 import IntegrityPage from './pages/admin/adminIntegration.jsx'
 import RolesPage from './pages/admin/adminRole.jsx'
 import TaskPage from './pages/admin/adminTask.jsx'
+import TaskEditorPage from './pages/admin/adminTaskEditor.jsx'
 import LandlordOverview from './pages/landlord/landlordOverview.jsx'
 import PreTenancy from './pages/landlord/pretenancy.jsx'
 import BehavioralReportPage from './pages/landlord/behaviouralreport.jsx'
@@ -36,12 +37,13 @@ function App() {
           <Route path="/login" element={<LoginPageWrapper />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
-                    
+
           {/* Admin Routes */}
-          <Route path="/adminOverview" element={<OverviewPage />} />
-          <Route path="/adminIntegration" element={<IntegrityPage />} />
-          <Route path="/adminRoles" element={<RolesPage />} />
-          <Route path="/adminTasks" element={<TaskPage />} />
+          <Route path="/adminOverview" element={<OverviewPageWrapper />} />
+          <Route path="/adminIntegration" element={<IntegrityPageWrapper />} />
+          <Route path="/adminRoles" element={<RolesPageWrapper />} />
+          <Route path="/adminTasks" element={<TaskPageWrapper />} />
+          <Route path="/adminTaskEditor" element={<TaskEditorPageWrapper />} />
 
           {/* Landlord Routes */}
           <Route path="/landlordOverview" element={<LandlordOverview />} />
@@ -95,6 +97,77 @@ function LoginPageWrapper() {
   };
 
   return <LoginPage onLogin={handleLogin} onForgotPassword={handleForgotPassword} />;
+}
+
+// Admin wrapper components
+function OverviewPageWrapper() {
+  const navigate = useNavigate();
+  return <OverviewPage onNavigate={(page) => {
+    switch (page) {
+      case 'overview': navigate('/adminOverview'); break;
+      case 'integration': navigate('/adminIntegration'); break;
+      case 'roles': navigate('/adminRoles'); break;
+      case 'tasks': navigate('/adminTasks'); break;
+      case 'editor': navigate('/adminTaskEditor'); break;
+      default: navigate('/adminOverview'); break;
+    }
+  }} />;
+}
+
+function IntegrityPageWrapper() {
+  const navigate = useNavigate();
+  return <IntegrityPage onNavigate={(page) => {
+    switch (page) {
+      case 'overview': navigate('/adminOverview'); break;
+      case 'integration': navigate('/adminIntegration'); break;
+      case 'roles': navigate('/adminRoles'); break;
+      case 'tasks': navigate('/adminTasks'); break;
+      case 'editor': navigate('/adminTaskEditor'); break;
+      default: navigate('/adminOverview'); break;
+    }
+  }} />;
+}
+
+function RolesPageWrapper() {
+  const navigate = useNavigate();
+  return <RolesPage onNavigate={(page) => {
+    switch (page) {
+      case 'overview': navigate('/adminOverview'); break;
+      case 'integration': navigate('/adminIntegration'); break;
+      case 'roles': navigate('/adminRoles'); break;
+      case 'tasks': navigate('/adminTasks'); break;
+      case 'editor': navigate('/adminTaskEditor'); break;
+      default: navigate('/adminOverview'); break;
+    }
+  }} />;
+}
+
+function TaskPageWrapper() {
+  const navigate = useNavigate();
+  return <TaskPage onNavigate={(page) => {
+    switch (page) {
+      case 'overview': navigate('/adminOverview'); break;
+      case 'integration': navigate('/adminIntegration'); break;
+      case 'roles': navigate('/adminRoles'); break;
+      case 'tasks': navigate('/adminTasks'); break;
+      case 'editor': navigate('/adminTaskEditor'); break;
+      default: navigate('/adminOverview'); break;
+    }
+  }} />;
+}
+
+function TaskEditorPageWrapper() {
+  const navigate = useNavigate();
+  return <TaskEditorPage onNavigate={(page) => {
+    switch (page) {
+      case 'overview': navigate('/adminOverview'); break;
+      case 'integration': navigate('/adminIntegration'); break;
+      case 'roles': navigate('/adminRoles'); break;
+      case 'tasks': navigate('/adminTasks'); break;
+      case 'editor': navigate('/adminTaskEditor'); break;
+      default: navigate('/adminOverview'); break;
+    }
+  }} />;
 }
 
 createRoot(document.getElementById('root')).render(

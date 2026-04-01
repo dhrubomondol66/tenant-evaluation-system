@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Sidebar from '../../component/adminComponent/adminSidebar.jsx';
 import Topbar from '../../component/adminComponent/adminTopbar.jsx';
+import Layout from '../../component/Layout.jsx';
 
 const initialUsers = [
   {
@@ -115,7 +116,7 @@ export default function RolesPage({ onNavigate }) {
     <div className="min-h-screen bg-gray-50">
       <Sidebar activePage="roles" onNavigate={onNavigate} />
       <Topbar />
-      <main className="ml-52 pt-14 p-6">
+      <Layout>
         <h1 className="text-xl font-bold text-gray-900 mb-1">System Reports & Audit Logs</h1>
         <p className="text-[13px] text-gray-500 mb-6">
           Comprehensive activity logs and detailed audit history for enterprise governance. Monitor
@@ -339,7 +340,7 @@ export default function RolesPage({ onNavigate }) {
             </div>
           </div>
         </div>
-      </main>
+      </Layout>
     </div>
   );
 }

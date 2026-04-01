@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Sidebar from '../../component/adminComponent/adminSidebar.jsx';
 import Topbar from '../../component/adminComponent/adminTopbar.jsx';
+import Layout from '../../component/Layout.jsx';
 
 export default function IntegrationPage({ onNavigate }) {
   const [webhooks, setWebhooks] = useState([
@@ -52,7 +53,7 @@ export default function IntegrationPage({ onNavigate }) {
     <div className="min-h-screen bg-gray-50">
       <Sidebar activePage="integration" onNavigate={onNavigate} />
       <Topbar />
-      <main className="ml-52 pt-14 p-6">
+      <Layout>
         <h1 className="text-xl font-bold text-gray-900 mb-6">Security, Backups & Deployments</h1>
 
         {/* Filters */}
@@ -252,7 +253,7 @@ export default function IntegrationPage({ onNavigate }) {
             </table>
           </div>
         </div>
-      </main>
+      </Layout>
     </div>
   );
 }

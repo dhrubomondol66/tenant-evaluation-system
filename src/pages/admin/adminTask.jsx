@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Sidebar from '../../component/adminComponent/adminSidebar.jsx';
 import Topbar from '../../component/adminComponent/adminTopbar.jsx';
+import Layout from '../../component/Layout.jsx';
 
 const dispatches = [
   { time: "9:00 AM",   label: "Welcome Assessment",    sub: "124 Tenants | Stage 1 | Schedule", status: "COMPLETED", color: "text-green-500",  dot: "bg-green-500" },
@@ -87,7 +88,7 @@ export default function TasksPage({ onNavigate }) {
     <div className="min-h-screen bg-gray-50">
       <Sidebar activePage="tasks" onNavigate={onNavigate} />
       <Topbar />
-      <main className="ml-52 pt-14 p-6">
+      <Layout>
         <h1 className="text-xl font-bold text-gray-900 mb-1">Task Management</h1>
         <p className="text-[13px] text-gray-500 mb-6">
           Configure behavioural assessment logic and operational task flows.
@@ -98,7 +99,11 @@ export default function TasksPage({ onNavigate }) {
           <div className="bg-white border border-gray-100 rounded-xl p-5">
             <div className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-2 flex items-center gap-1">
               ACTIVE SCHEDULES
-              <svg width="12" height="12" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="#d1d5db" strokeWidth="1.8"/><path d="M12 8v4" stroke="#d1d5db" strokeWidth="1.8" strokeLinecap="round"/><circle cx="12" cy="16" r="1" fill="#d1d5db"/></svg>
+              <svg width="12" height="12" fill="none" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="9" stroke="#d1d5db" strokeWidth="1.8"/>
+                <path d="M12 8v4" stroke="#d1d5db" strokeWidth="1.8" strokeLinecap="round"/>
+                <circle cx="12" cy="16" r="1" fill="#d1d5db"/>
+              </svg>
             </div>
             <div className="text-2xl font-bold text-gray-900">24</div>
             <div className="text-[11px] text-blue-500 mt-1">+2 New</div>
@@ -119,7 +124,9 @@ export default function TasksPage({ onNavigate }) {
           <div className="bg-white border border-red-200 rounded-xl p-5">
             <div className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-2 flex items-center gap-1">
               COMPLETION RATE
-              <svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" stroke="#f59e0b" strokeWidth="1.8"/></svg>
+              <svg width="12" height="12" fill="none" viewBox="0 0 24 24">
+                <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" stroke="#f59e0b" strokeWidth="1.8"/>
+              </svg>
             </div>
             <div className="text-2xl font-bold text-red-500">68%</div>
             <div className="text-[11px] text-red-500 mt-1">Below Threshold</div>
@@ -338,7 +345,7 @@ export default function TasksPage({ onNavigate }) {
             </div>
           </div>
         </div>
-      </main>
+      </Layout>
     </div>
   );
 }

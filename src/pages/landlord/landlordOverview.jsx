@@ -1,5 +1,6 @@
 // src/pages/Overview.jsx
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import LandlordSidebar from "../../component/landlordComponent/landlordSidebar.jsx";
 import LandlordTopbar from "../../component/landlordComponent/landlordTopbar.jsx";
 import Layout from "../../component/Layout.jsx";
@@ -281,8 +282,11 @@ const ScoreBar = ({ score, status }) => {
 };
 
 export default function Overview({ onNavigate }) {
+  const navigate = useNavigate();
   const [dashState, setDashState] = useState("no-property");
   const [showProgressModal, setShowProgressModal] = useState(false);
+  const [showAddPropertyModal, setShowAddPropertyModal] = useState(false);
+  const [showPreTenancyModal, setShowPreTenancyModal] = useState(false);
   const [hoveredRisk, setHoveredRisk] = useState(null);
   const [chartView, setChartView] = useState("participation"); // New state for chart toggle
 
@@ -296,6 +300,14 @@ export default function Overview({ onNavigate }) {
 
   const handleViewProgress = () => {
     setShowProgressModal(true);
+  };
+
+  const handleAddProperty = () => {
+    setShowAddPropertyModal(true);
+  };
+
+  const handleStartPreTenancy = () => {
+    setShowPreTenancyModal(true);
   };
 
   // Dynamic chart data based on selected view
@@ -393,7 +405,14 @@ export default function Overview({ onNavigate }) {
           </div>
         </div>
         <button 
-          onClick={dashState === "pre-tenancy-active" ? handleViewProgress : handleNextState}
+          onClick={
+            dashState === "pre-tenancy-active" ? handleViewProgress : 
+            dashState === "no-property" ? handleAddProperty :
+            dashState === "no-tenant" ? handleStartPreTenancy :
+            dashState === "monitoring-inactive" ? () => navigate("/landlordBehaviouralRisk") :
+            dashState === "report-ready" ? () => navigate("/landlordEarlyWarnings") :
+            handleNextState
+          }
           className={`px-4 py-2 rounded-lg text-[12.5px] font-bold transition-all shrink-0 ${banner.btnClass}`}
         >
           {banner.btnLabel}
@@ -574,7 +593,10 @@ export default function Overview({ onNavigate }) {
         <div className="bg-white border border-gray-100 rounded-xl p-5 shadow-sm mb-5">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-[14px] font-bold text-gray-900">Pre-Tenancy Applications</h3>
-            <button className="flex items-center gap-2 text-[12px] font-medium text-blue-600 hover:text-blue-700 transition-colors">
+            <button 
+              onClick={handleStartPreTenancy}
+              className="flex items-center gap-2 text-[12px] font-medium text-blue-600 hover:text-blue-700 transition-colors"
+            >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
               </svg>
@@ -631,6 +653,158 @@ export default function Overview({ onNavigate }) {
           ))}
         </div>
       </div>
+
+      {/* Start Pre-Tenancy Modal */}
+      {showPreTenancyModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="flex items-center justify-between p-6 border-b border-gray-50">
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">Start Pre-Tenancy Process</h2>
+                <p className="text-xs text-gray-400 mt-1">Onboard an applicant for behavioral assessment.</p>
+              </div>
+              <button 
+                onClick={() => setShowPreTenancyModal(false)}
+                className="w-10 h-10 rounded-full bg-gray-50 hover:bg-gray-100 flex items-center justify-center transition-all text-gray-400 hover:text-gray-600"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            <form className="p-6 space-y-5" onSubmit={(e) => { e.preventDefault(); setShowPreTenancyModal(false); setDashState("pre-tenancy-active"); }}>
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-bold uppercase tracking-wider text-gray-400 px-1">Applicant Name</label>
+                <input 
+                  type="text" 
+                  placeholder="e.g. John Doe"
+                  className="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                  required
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-bold uppercase tracking-wider text-gray-400 px-1">Applicant Email</label>
+                <input 
+                  type="email" 
+                  placeholder="john.doe@example.com"
+                  className="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                  required
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-bold uppercase tracking-wider text-gray-400 px-1">Target Property</label>
+                <select className="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all">
+                  <option disabled selected>Select from your portfolio...</option>
+                  <option>Riverside A-12</option>
+                  <option>Park View 101</option>
+                  <option>Grand Plaza 3B</option>
+                </select>
+              </div>
+
+              <div className="pt-4 flex gap-3">
+                <button 
+                  type="button"
+                  onClick={() => setShowPreTenancyModal(false)}
+                  className="flex-1 px-6 py-3 rounded-xl text-sm font-bold text-gray-500 bg-gray-50 hover:bg-gray-100 transition-all"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit"
+                  className="flex-1 px-6 py-3 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all"
+                >
+                  Start Assessment
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Add Property Modal */}
+      {showAddPropertyModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="flex items-center justify-between p-6 border-b border-gray-50">
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">Add New Property</h2>
+                <p className="text-xs text-gray-400 mt-1">Enter your property details to get started.</p>
+              </div>
+              <button 
+                onClick={() => setShowAddPropertyModal(false)}
+                className="w-10 h-10 rounded-full bg-gray-50 hover:bg-gray-100 flex items-center justify-center transition-all text-gray-400 hover:text-gray-600"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            <form className="p-6 space-y-5" onSubmit={(e) => { e.preventDefault(); setShowAddPropertyModal(false); setDashState("no-tenant"); }}>
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-bold uppercase tracking-wider text-gray-400 px-1">Property Name</label>
+                <input 
+                  type="text" 
+                  placeholder="e.g. Riverside Apartments"
+                  className="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all"
+                  required
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-bold uppercase tracking-wider text-gray-400 px-1">Address</label>
+                <input 
+                  type="text" 
+                  placeholder="Street address, City, State, Zip"
+                  className="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all"
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-[11px] font-bold uppercase tracking-wider text-gray-400 px-1">Property Type</label>
+                  <select className="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all">
+                    <option>Multi-Family</option>
+                    <option>Single Family</option>
+                    <option>Commercial</option>
+                    <option>Other</option>
+                  </select>
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[11px] font-bold uppercase tracking-wider text-gray-400 px-1">Number of Units</label>
+                  <input 
+                    type="number" 
+                    placeholder="1"
+                    className="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all"
+                    min="1"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="pt-4 flex gap-3">
+                <button 
+                  type="button"
+                  onClick={() => setShowAddPropertyModal(false)}
+                  className="flex-1 px-6 py-3 rounded-xl text-sm font-bold text-gray-500 bg-gray-50 hover:bg-gray-100 transition-all"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit"
+                  className="flex-1 px-6 py-3 rounded-xl text-sm font-bold text-white bg-violet-600 hover:bg-violet-700 shadow-lg shadow-violet-200 transition-all"
+                >
+                  Create Property
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Progress Modal */}
       {showProgressModal && (
