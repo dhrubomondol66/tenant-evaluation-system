@@ -3,7 +3,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer utilities {
+/* @layer utilities {
   .animate-in {
     animation-duration: 200ms;
     animation-fill-mode: forwards;
@@ -25,4 +25,4 @@
 @keyframes zoomIn {
   from { transform: scale(0.95); opacity: 0; }
   to { transform: scale(1); opacity: 1; }
-}
+} */
